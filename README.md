@@ -64,27 +64,12 @@ git clone <url-del-repositorio>
 cd gymflow
 ```
 
-2. **Crear entorno virtual**
-```bash
-python -m venv venv
-```
-
-3. **Activar entorno virtual**
-- Windows:
-  ```bash
-  venv\Scripts\activate
-  ```
-- Linux/Mac:
-  ```bash
-  source venv/bin/activate
-  ```
-
-4. **Instalar dependencias**
+2. **Instalar dependencias**
 ```bash
 pip install -r requirements.txt
 ```
 
-5. **Configurar Base de Datos**
+3. **Configurar Base de Datos**
 
 Crear base de datos en MySQL:
 ```sql
@@ -105,22 +90,22 @@ DATABASES = {
 }
 ```
 
-6. **Ejecutar migraciones**
+4. **Ejecutar migraciones**
 ```bash
 python manage.py migrate
 ```
 
-7. **Crear superusuario (administrador)**
+5. **Crear superusuario (administrador)**
 ```bash
 python manage.py createsuperuser
 ```
 
-8. **Iniciar servidor de desarrollo**
+6. **Iniciar servidor de desarrollo**
 ```bash
 python manage.py runserver
 ```
 
-9. **Acceder a la aplicación**
+7. **Acceder a la aplicación**
 - Aplicación: http://localhost:8000
 - Panel de administración: http://localhost:8000/admin
 
@@ -188,8 +173,6 @@ Para desplegar en producción, se recomienda:
 4. **Variables de entorno**: Usar `.env` para secretos
 5. **Configurar**: `DEBUG = False` en producción
 
-Ver `EVALUACION_PROYECTO.md` para más detalles sobre despliegue.
-
 ---
 
 ## 🔐 Seguridad
@@ -221,12 +204,6 @@ Desarrollado para el curso de Ingeniería de Software - INACAP
 ## 📞 Soporte
 
 Para reportar problemas o sugerencias, contactar al desarrollador.
-
----
-
-## 🎓 Documentación Adicional
-
-- **EVALUACION_PROYECTO.md**: Documentación completa del proyecto (evaluación académica)
 
 ---
 
