@@ -1,0 +1,122 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}{{ ejercicio.nombre }} - GymFlow{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex justify-between align-center mb-3">
+        <h1>{{ ejercicio.nombre }}</h1>
+        <div class="d-flex gap-1">
+            <a href="{% url 'toggle_favorito' ejercicio.ejercicio_id %}" class="btn btn-{% if es_favorito %}danger{% else %}success{% endif %} btn-sm">
+                {% if es_favorito %}★ Favorito{% else %}☆ Agregar favorito{% endif %}
+            </a>
+            <a href="{% url 'ejercicios_list' %}" class="btn btn-primary">← Volver</a>
+        </div>
+    </div>
+    
+    <!-- GIF Animado del Ejercicio -->
+    {% if ejercicio_data.gifUrl or ejercicio.gif_url %}
+    <div style="margin-bottom:2rem;">
+        <h3>🎬 Demostración Animada</h3>
+        <div style="background:#f8f9fa; padding:1rem; border-radius:8px; text-align:center;">
+            <img src="{% if ejercicio_data.gifUrl %}{{ ejercicio_data.gifUrl }}{% else %}{{ ejercicio.gif_url }}{% endif %}" 
+                 alt="{{ ejercicio.nombre }} - Demo" 
+                 style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
+                 onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div style=\'background:linear-gradient(135deg,#667eea,#764ba2); color:white; padding:2rem; border-radius:8px; text-align:center; font-size:4rem;\'>🏋️<br><span style=\'font-size:1.2rem; margin-top:1rem; display:block;\'>{{ ejercicio.nombre }}</span></div>';">
+        </div>
+        <p style="margin-top:0.5rem; font-size:0.85rem; color:#666; text-align:center;">
+            🔄 GIF en bucle continuo mostrando la técnica correcta
+        </p>
+    </div>
+    {% endif %}
+    
+    <!-- Contenido -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
+        <div>
+            <h3>📸 Imagen</h3>
+            {% if ejercicio.imagen_url %}
+                {% if 'http' in ejercicio.imagen_url %}
+                <img src="{{ ejercicio.imagen_url }}" alt="{{ ejercicio.nombre }}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" 
+                     onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div style=\'width:100%; height:350px; background:linear-gradient(135deg,#667eea,#764ba2); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-size:6rem; flex-direction:column;\'><span>🏋️</span><span style=\'font-size:1rem; margin-top:1rem;\'>{{ ejercicio.nombre }}</span></div>';">
+                {% else %}
+                <img src="https://exercisedb.dev/{{ ejercicio.imagen_url }}" alt="{{ ejercicio.nombre }}" style="width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);"
+                     onerror="this.onerror=null; this.style.display='none'; this.parentElement.innerHTML='<div style=\'width:100%; height:350px; background:linear-gradient(135deg,#667eea,#764ba2); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-size:6rem; flex-direction:column;\'><span>🏋️</span><span style=\'font-size:1rem; margin-top:1rem;\'>{{ ejercicio.nombre }}</span></div>';">
+                {% endif %}
+            {% else %}
+            <div style="width:100%; height:350px; background:linear-gradient(135deg,#667eea,#764ba2); border-radius:8px; display:flex; align-items:center; justify-content:center; color:white; font-size:6rem;">
+                🏋️
+            </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <h3>Información</h3>
+            
+            {% if ejercicio.descripcion %}
+            <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-bottom:1rem;">
+                <p>{{ ejercicio.descripcion }}</p>
+            </div>
+            {% endif %}
+            
+            <p><strong>💪 Músculos:</strong> {{ ejercicio.musculos_principales }}</p>
+            <p><strong>🏋️ Equipo:</strong> {{ ejercicio.equipamiento }}</p>
+            <p><strong>📊 Parte:</strong> {{ ejercicio.partes_cuerpo }}</p>
+            
+            {% if ejercicio.advertencias %}
+            <div style="background:#fff3cd; padding:1rem; border-radius:8px; margin-top:1rem;">
+                <p style="margin:0; color:#856404;"><strong>⚠️</strong> {{ ejercicio.advertencias }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Instrucciones -->
+    {% if ejercicio_data.instructions %}
+    <div style="margin-top:2rem;">
+        <h3>📋 Instrucciones</h3>
+        <ol>
+            {% for inst in ejercicio_data.instructions %}
+            <li style="margin-bottom:0.5rem;">{{ inst }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+    
+    <!-- Consejos -->
+    {% if ejercicio_data.tips %}
+    <div style="margin-top:1.5rem; background:#e8f5e9; padding:1.5rem; border-radius:8px;">
+        <h3 style="color:#2ecc71;">💡 Consejos</h3>
+        <ul>
+            {% for tip in ejercicio_data.tips %}
+            <li style="margin-bottom:0.5rem;">{{ tip }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Solo inicializar Video.js si hay videos MP4 (no YouTube)
+document.addEventListener('DOMContentLoaded', function() {
+    var players = document.querySelectorAll('[id^="video-"]');
+    if (players.length > 0) {
+        players.forEach(function(el) {
+            try {
+                videojs(el.id, {
+                    controls: true,
+                    fluid: true,
+                    playbackRates: [0.5, 1, 1.5, 2],
+                    controlBar: {
+                        pictureInPictureToggle: true
+                    }
+                });
+            } catch(e) {
+                console.log('Video.js no necesario para este video');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

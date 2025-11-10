@@ -1,0 +1,34 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Registrar Entrenamiento - GymFlow{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Registrar Entrenamiento</h1>
+    <h2>{{ rutina.nombre }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Duración (minutos)</label>
+            <input type="number" name="duracion" class="form-control" placeholder="60">
+        </div>
+        
+        <div class="form-group">
+            <label>Nivel de Esfuerzo (1-10)</label>
+            <input type="number" name="esfuerzo" class="form-control" min="1" max="10" value="5">
+        </div>
+        
+        <div class="form-group">
+            <label>Notas</label>
+            <textarea name="notas" class="form-control" rows="3" placeholder="¿Cómo te sentiste?"></textarea>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">✓ Registrar</button>
+            <a href="{% url 'rutina_detail' rutina.id %}" class="btn btn-danger">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

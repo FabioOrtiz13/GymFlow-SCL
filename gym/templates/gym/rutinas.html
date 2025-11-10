@@ -1,0 +1,57 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Rutinas - GymFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-between align-center mb-3">
+    <h1>Mis Rutinas 📋</h1>
+    {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+    <a href="{% url 'rutina_create' %}" class="btn btn-success">+ Nueva</a>
+    {% else %}
+    <span class="text-muted">💡 Las rutinas son creadas por entrenadores</span>
+    {% endif %}
+</div>
+
+<!-- Filtros -->
+<div class="card">
+    <div class="d-flex gap-2">
+        <a href="{% url 'rutinas_list' %}" class="btn btn-{% if filtro == 'todas' %}primary{% else %}secondary{% endif %}">Todas</a>
+        <a href="?filtro=activas" class="btn btn-{% if filtro == 'activas' %}success{% else %}secondary{% endif %}">Activas</a>
+        <a href="?filtro=inactivas" class="btn btn-{% if filtro == 'inactivas' %}danger{% else %}secondary{% endif %}">Inactivas</a>
+    </div>
+</div>
+
+{% if rutinas %}
+<div class="grid">
+    {% for r in rutinas %}
+    <div class="rutina-card">
+        <div class="d-flex justify-between align-center mb-2">
+            <h3>{{ r.nombre }}</h3>
+            <span class="badge badge-{% if r.activa %}success{% else %}danger{% endif %}">{{ r.activa|yesno:'Activa,Inactiva' }}</span>
+        </div>
+        <p>{{ r.descripcion|truncatewords:20 }}</p>
+        <p><strong>Dificultad:</strong> <span class="badge badge-primary">{{ r.get_dificultad_display }}</span></p>
+        <p><strong>Duración:</strong> {{ r.duracion_min }} min</p>
+        <p><strong>Ejercicios:</strong> {{ r.num_ejercicios }}</p>
+        <div class="d-flex gap-1 mt-2">
+            <a href="{% url 'rutina_detail' r.id %}" class="btn btn-primary btn-sm">Ver</a>
+            {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+            <a href="{% url 'rutina_edit' r.id %}" class="btn btn-primary btn-sm">Editar</a>
+            {% endif %}
+            <a href="{% url 'registrar_entrenamiento' r.id %}" class="btn btn-success btn-sm">Registrar</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card text-center">
+    <p>No tienes rutinas</p>
+    {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+    <a href="{% url 'rutina_create' %}" class="btn btn-success">Crear primera rutina</a>
+    {% else %}
+    <p class="text-muted">Las rutinas te serán asignadas por un entrenador. <a href="{% url 'entrenadores_list' %}">Ver entrenadores</a></p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+

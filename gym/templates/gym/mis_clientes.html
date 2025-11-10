@@ -1,0 +1,71 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Mis Clientes - GymFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👥 Mis Clientes</h1>
+    <p class="text-muted">Rutinas asignadas a tus clientes</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ total_clientes }}</h3>
+        <p>Clientes Activos</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_rutinas }}</h3>
+        <p>Rutinas Asignadas</p>
+    </div>
+</div>
+
+{% if clientes %}
+    {% for cliente, rutinas in clientes.items %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>👤 {{ cliente.username }}</h3>
+            {% if cliente.get_full_name %}
+            <p class="text-muted mb-0">{{ cliente.get_full_name }}</p>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <p><strong>Rutinas asignadas:</strong> {{ rutinas|length }}</p>
+            
+            <div class="rutinas-list">
+                {% for rutina in rutinas %}
+                <div class="rutina-item">
+                    <div class="rutina-info">
+                        <h4>
+                            <a href="{% url 'rutina_detail' rutina.id %}">{{ rutina.nombre }}</a>
+                        </h4>
+                        <p class="text-muted">
+                            {{ rutina.get_dificultad_display }} • 
+                            {{ rutina.duracion_min }} min • 
+                            {{ rutina.total_ejercicios }} ejercicios
+                        </p>
+                        <small class="text-muted">Asignada: {{ rutina.fecha_creacion|date:"d/m/Y" }}</small>
+                    </div>
+                    <div class="rutina-status">
+                        {% if rutina.activa %}
+                        <span class="badge badge-success">Activa</span>
+                        {% else %}
+                        <span class="badge badge-secondary">Inactiva</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="card">
+        <div class="card-body text-center">
+            <h3>📋 No has asignado rutinas aún</h3>
+            <p class="text-muted">Crea rutinas y asígnalas a tus clientes para empezar.</p>
+            <a href="{% url 'rutina_create' %}" class="btn btn-primary mt-3">Crear nueva rutina</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+

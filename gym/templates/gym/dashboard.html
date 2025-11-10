@@ -1,0 +1,93 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Dashboard - GymFlow{% endblock %}
+
+{% block content %}
+<h1 class="card-title">¡Hola, {{ user.username}}! 💪</h1>
+
+<!-- Estadísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_rutinas }}</div>
+        <div class="stat-label">Rutinas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_entrenamientos }}</div>
+        <div class="stat-label">Entrenamientos</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ favoritos_count }}</div>
+        <div class="stat-label">Favoritos</div>
+    </div>
+    {% if ultimo_progreso %}
+    <div class="stat-card">
+        <div class="stat-number">{{ ultimo_progreso.peso }}</div>
+        <div class="stat-label">Peso (kg)</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Rutinas Recientes -->
+<div class="card">
+    <div class="d-flex justify-between align-center mb-2">
+        <h2>Mis Rutinas</h2>
+        {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+        <a href="{% url 'rutina_create' %}" class="btn btn-success">+ Nueva</a>
+        {% endif %}
+    </div>
+    
+    {% if rutinas_recientes %}
+    <div class="grid">
+        {% for rutina in rutinas_recientes %}
+        <div class="rutina-card">
+            <h3>{{ rutina.nombre }}</h3>
+            <p>{{ rutina.descripcion|truncatewords:15 }}</p>
+            <div class="d-flex justify-between align-center mt-2">
+                <span class="badge badge-primary">{{ rutina.get_dificultad_display }}</span>
+                <span>{{ rutina.total_ejercicios }} ejercicios</span>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+                <a href="{% url 'rutina_detail' rutina.id %}" class="btn btn-primary btn-sm">Ver</a>
+                <a href="{% url 'registrar_entrenamiento' rutina.id %}" class="btn btn-success btn-sm">Registrar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>
+        {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+        No tienes rutinas. <a href="{% url 'rutina_create' %}">Crea una</a>
+        {% else %}
+        No tienes rutinas asignadas aún. Consulta con un entrenador.
+        {% endif %}
+    </p>
+    {% endif %}
+</div>
+
+<!-- Últimos Entrenamientos -->
+{% if entrenamientos_recientes %}
+<div class="card">
+    <h2>Últimos Entrenamientos</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rutina</th>
+                <th>Fecha</th>
+                <th>Duración</th>
+                <th>Esfuerzo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in entrenamientos_recientes %}
+            <tr>
+                <td>{{ e.rutina.nombre }}</td>
+                <td>{{ e.fecha|date:"d/m/Y" }}</td>
+                <td>{{ e.duracion_min|default:"—" }} min</td>
+                <td>{{ e.nivel_esfuerzo }}/10</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

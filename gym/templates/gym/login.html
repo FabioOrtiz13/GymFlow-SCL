@@ -1,0 +1,48 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Iniciar Sesión - GymFlow{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">💪 GymFlow</h1>
+        <h2 class="text-center mb-3">Iniciar Sesión</h2>
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> Usuario o contraseña incorrectos.
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Usuario</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <small class="text-danger">{{ form.username.errors }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label>Contraseña</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <small class="text-danger">{{ form.password.errors }}</small>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar</button>
+        </form>
+        
+        <p class="text-center mt-3">
+            <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+        </p>
+        
+        <p class="text-center mt-2">
+            ¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

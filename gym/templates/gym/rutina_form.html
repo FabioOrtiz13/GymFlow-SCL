@@ -1,0 +1,48 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}{{ action }} Rutina - GymFlow{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>{{ action }} Rutina</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Nombre</label>
+            {{ form.nombre }}
+        </div>
+        
+        <div class="form-group">
+            <label>Descripción</label>
+            {{ form.descripcion }}
+        </div>
+        
+        <div class="form-group">
+            <label>Dificultad</label>
+            {{ form.dificultad }}
+        </div>
+        
+        <div class="form-group">
+            <label>Duración (minutos)</label>
+            {{ form.duracion_min }}
+        </div>
+        
+        <div class="form-group">
+            <label>Objetivo</label>
+            {{ form.objetivo }}
+        </div>
+        
+        <div class="form-group form-check">
+            {{ form.activa }}
+            <label>Activa</label>
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">{{ action }}</button>
+            <a href="{% if rutina %}{% url 'rutina_detail' rutina.id %}{% else %}{% url 'rutinas_list' %}{% endif %}" class="btn btn-danger">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

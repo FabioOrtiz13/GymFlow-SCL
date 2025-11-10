@@ -1,0 +1,79 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}{{ rutina.nombre }} - GymFlow{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex justify-between align-center mb-3">
+        <h1>{{ rutina.nombre }}</h1>
+        <div class="d-flex gap-1">
+            {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+            <a href="{% url 'rutina_edit' rutina.id %}" class="btn btn-primary">Editar</a>
+            <a href="{% url 'rutina_delete' rutina.id %}" class="btn btn-danger">Eliminar</a>
+            {% endif %}
+            <a href="{% url 'rutinas_list' %}" class="btn btn-primary">← Volver</a>
+        </div>
+    </div>
+    
+    <p>{{ rutina.descripcion }}</p>
+    <p><strong>Dificultad:</strong> <span class="badge badge-primary">{{ rutina.get_dificultad_display }}</span></p>
+    <p><strong>Duración:</strong> {{ rutina.duracion_min }} minutos</p>
+    
+    <div class="d-flex gap-1">
+        <a href="{% url 'registrar_entrenamiento' rutina.id %}" class="btn btn-success">✓ Registrar Entrenamiento</a>
+        
+        {% if user.perfil.es_entrenador %}
+        <a href="{% url 'asignar_rutina' rutina.id %}" class="btn btn-primary">📋 Asignar a Cliente</a>
+        {% endif %}
+    </div>
+    
+    {% if rutina.entrenador %}
+    <p class="mt-3"><strong>👨‍🏫 Asignada por:</strong> {{ rutina.entrenador.username }}</p>
+    {% endif %}
+</div>
+
+<!-- Ejercicios -->
+<div class="card">
+    <div class="d-flex justify-between align-center mb-2">
+        <h2>Ejercicios ({{ detalles.count }})</h2>
+        {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+        <a href="{% url 'agregar_ejercicio' rutina.id %}" class="btn btn-success">+ Agregar</a>
+        {% endif %}
+    </div>
+    
+    {% if detalles %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Ejercicio</th>
+                <th>Series</th>
+                <th>Reps</th>
+                <th>Peso</th>
+                <th>Descanso</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in detalles %}
+            <tr>
+                <td>{{ d.orden }}</td>
+                <td><a href="{% url 'ejercicio_detail' d.ejercicio.ejercicio_id %}">{{ d.ejercicio.nombre }}</a></td>
+                <td>{{ d.series }}</td>
+                <td>{{ d.repeticiones }}</td>
+                <td>{{ d.peso|default:"—" }}</td>
+                <td>{{ d.descanso_seg }}s</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>
+        {% if user.perfil.es_entrenador or user.perfil.es_admin %}
+        Sin ejercicios. <a href="{% url 'agregar_ejercicio' rutina.id %}">Agrega el primero</a>
+        {% else %}
+        Esta rutina aún no tiene ejercicios.
+        {% endif %}
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

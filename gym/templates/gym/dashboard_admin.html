@@ -1,0 +1,201 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Dashboard Admin - GymFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👑 Panel de Administración</h1>
+    <p class="text-muted">¡Hola, {{ user.username }}! Vista general del sistema GymFlow</p>
+</div>
+
+<!-- Estadísticas Generales -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_usuarios }}</div>
+        <div class="stat-label">👤 Usuarios</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_entrenadores }}</div>
+        <div class="stat-label">👨‍🏫 Entrenadores</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_rutinas }}</div>
+        <div class="stat-label">📋 Rutinas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_ejercicios }}</div>
+        <div class="stat-label">🏋️ Ejercicios</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_entrenamientos }}</div>
+        <div class="stat-label">✅ Entrenamientos</div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="card">
+    <h2>⚡ Accesos Rápidos</h2>
+    <div class="d-flex gap-1">
+        <a href="/admin/" class="btn btn-primary">🔧 Panel Django Admin</a>
+        <a href="{% url 'entrenadores_list' %}" class="btn btn-primary">👨‍🏫 Ver Entrenadores</a>
+        <a href="{% url 'rutinas_list' %}" class="btn btn-primary">📋 Ver Rutinas</a>
+        <a href="{% url 'ejercicios_list' %}" class="btn btn-primary">🏋️ Ver Ejercicios</a>
+    </div>
+</div>
+
+<!-- Usuarios Recientes -->
+<div class="card">
+    <h2>🆕 Usuarios Recientes</h2>
+    
+    {% if usuarios_recientes %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Tipo</th>
+                <th>Fecha Registro</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios_recientes %}
+            <tr>
+                <td>{{ usuario.username }}</td>
+                <td>{{ usuario.email|default:"—" }}</td>
+                <td>
+                    {% if usuario.perfil.tipo_usuario == 'administrador' %}
+                        👑 Admin
+                    {% elif usuario.perfil.tipo_usuario == 'entrenador' %}
+                        👨‍🏫 Entrenador
+                    {% else %}
+                        💪 Usuario
+                    {% endif %}
+                </td>
+                <td>{{ usuario.date_joined|date:"d/m/Y H:i" }}</td>
+                <td>
+                    {% if usuario.is_active %}
+                    <span class="badge badge-success">Activo</span>
+                    {% else %}
+                    <span class="badge badge-danger">Inactivo</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">No hay usuarios registrados aún.</p>
+    {% endif %}
+</div>
+
+<!-- Rutinas Más Populares -->
+{% if rutinas_populares %}
+<div class="card">
+    <h2>🔥 Rutinas Más Populares</h2>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rutina</th>
+                <th>Creador</th>
+                <th>Entrenamientos</th>
+                <th>Dificultad</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rutina in rutinas_populares %}
+            <tr>
+                <td><a href="{% url 'rutina_detail' rutina.id %}">{{ rutina.nombre }}</a></td>
+                <td>{{ rutina.usuario.username }}</td>
+                <td><strong>{{ rutina.num_entrenamientos }}</strong></td>
+                <td>{{ rutina.get_dificultad_display }}</td>
+                <td>
+                    {% if rutina.activa %}
+                    <span class="badge badge-success">Activa</span>
+                    {% else %}
+                    <span class="badge badge-secondary">Inactiva</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Entrenadores Más Activos -->
+{% if entrenadores_activos %}
+<div class="card">
+    <h2>⭐ Entrenadores Más Activos</h2>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Entrenador</th>
+                <th>Email</th>
+                <th>Rutinas Asignadas</th>
+                <th>Especialidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entrenador in entrenadores_activos %}
+            <tr>
+                <td>👨‍🏫 {{ entrenador.username }}</td>
+                <td>{{ entrenador.email|default:"—" }}</td>
+                <td><strong>{{ entrenador.num_rutinas_asignadas }}</strong></td>
+                <td>{{ entrenador.perfil.especialidad|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Información del Sistema -->
+<div class="card">
+    <h2>ℹ️ Información del Sistema</h2>
+    
+    <div class="grid">
+        <div>
+            <h4>Estado del Sistema</h4>
+            <p>✅ Operativo</p>
+            <p>🔒 Seguridad: Django {{ request.version }}</p>
+        </div>
+        
+        <div>
+            <h4>Base de Datos</h4>
+            <p>📊 MySQL - Puerto 3308</p>
+            <p>🗄️ Base: db_gym</p>
+        </div>
+        
+        <div>
+            <h4>Funcionalidades</h4>
+            <p>✅ ExerciseDB API: 5000+ ejercicios</p>
+            <p>✅ Sistema de asignación de rutinas</p>
+            <p>✅ Registro de progreso físico</p>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones de Administración -->
+<div class="card">
+    <h2>🛠️ Gestión del Sistema</h2>
+    
+    <div class="alert alert-info">
+        <strong>💡 Tip:</strong> Para gestión avanzada de usuarios, perfiles y datos, 
+        usa el <a href="/admin/" class="alert-link">Panel de Django Admin</a>.
+    </div>
+    
+    <h4>Tareas comunes:</h4>
+    <ul>
+        <li>📝 <a href="/admin/gym/perfilusuario/">Gestionar perfiles de usuario</a></li>
+        <li>👨‍🏫 <a href="/admin/gym/perfilusuario/?tipo_usuario=entrenador">Gestionar entrenadores</a></li>
+        <li>🏋️ <a href="/admin/gym/ejercicio/">Gestionar ejercicios</a></li>
+        <li>📋 <a href="/admin/gym/rutina/">Gestionar rutinas</a></li>
+        <li>👤 <a href="/admin/auth/user/">Gestionar usuarios Django</a></li>
+    </ul>
+</div>
+{% endblock %}
+

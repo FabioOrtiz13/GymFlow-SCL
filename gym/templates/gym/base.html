@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GymFlow{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo.png' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Video.js -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet">
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="navbar">
+        <div class="container">
+            <a href="
+                {% if user.perfil.tipo_usuario == 'administrador' %}{% url 'dashboard_admin' %}
+                {% elif user.perfil.tipo_usuario == 'entrenador' %}{% url 'dashboard_entrenador' %}
+                {% else %}{% url 'dashboard' %}{% endif %}
+            " class="navbar-brand">
+                <img src="{% static 'images/logo.png' %}" alt="GymFlow Logo" class="navbar-logo">
+                <span class="navbar-brand-text">GymFlow</span>
+                {% if user.perfil.tipo_usuario == 'administrador' %}
+                    <span class="badge badge-danger" style="font-size: 0.7em;">👑 ADMIN</span>
+                {% elif user.perfil.tipo_usuario == 'entrenador' %}
+                    <span class="badge badge-primary" style="font-size: 0.7em;">👨‍🏫 ENTRENADOR</span>
+                {% endif %}
+            </a>
+            <ul class="navbar-nav">
+                <!-- Dashboard según tipo -->
+                <li><a href="
+                    {% if user.perfil.tipo_usuario == 'administrador' %}{% url 'dashboard_admin' %}
+                    {% elif user.perfil.tipo_usuario == 'entrenador' %}{% url 'dashboard_entrenador' %}
+                    {% else %}{% url 'dashboard' %}{% endif %}
+                ">Dashboard</a></li>
+                
+                <li><a href="{% url 'ejercicios_list' %}">Ejercicios</a></li>
+                <li><a href="{% url 'rutinas_list' %}">Rutinas</a></li>
+                
+                <!-- Menú específico para entrenadores -->
+                {% if user.perfil.es_entrenador %}
+                <li><a href="{% url 'mis_clientes' %}">👥 Mis Clientes</a></li>
+                {% endif %}
+                
+                <!-- Menú específico para admins -->
+                {% if user.perfil.es_admin %}
+                <li><a href="/admin/" target="_blank">🔧 Admin Panel</a></li>
+                {% endif %}
+                
+                <li><a href="{% url 'entrenadores_list' %}">Entrenadores</a></li>
+                <li><a href="{% url 'progreso' %}">Progreso</a></li>
+                <li><a href="{% url 'favoritos' %}">⭐ Favoritos</a></li>
+                
+                <!-- Perfil con indicador de tipo -->
+                <li><a href="{% url 'mi_perfil' %}">
+                    {% if user.perfil.tipo_usuario == 'administrador' %}👑
+                    {% elif user.perfil.tipo_usuario == 'entrenador' %}👨‍🏫
+                    {% else %}👤{% endif %}
+                    {{ user.username }}
+                </a></li>
+                
+                <li><a href="{% url 'logout' %}">Salir</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="container">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

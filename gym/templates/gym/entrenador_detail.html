@@ -1,0 +1,60 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}{{ entrenador.user.username }} - GymFlow{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex justify-between align-center mb-3">
+        <h1>Perfil del Entrenador</h1>
+        <a href="{% url 'entrenadores_list' %}" class="btn btn-primary">← Volver</a>
+    </div>
+    
+    <div style="display:grid; grid-template-columns:1fr 2fr; gap:2rem;">
+        <div style="text-align:center;">
+            {% if entrenador.foto_perfil %}
+            <img src="{{ entrenador.foto_perfil }}" alt="{{ entrenador.user.username }}" style="width:200px; height:200px; border-radius:50%; object-fit:cover; border:4px solid #3498db;">
+            {% else %}
+            <div style="width:200px; height:200px; border-radius:50%; background:#3498db; color:white; display:flex; align-items:center; justify-content:center; font-size:5rem; margin:0 auto;">{{ entrenador.user.username.0|upper }}</div>
+            {% endif %}
+            
+            <h2 style="margin-top:1rem;">{{ entrenador.user.get_full_name|default:entrenador.user.username }}</h2>
+            <p style="color:#666;">{{ entrenador.especialidad }}</p>
+            
+            <span class="badge badge-{% if entrenador.disponible %}success{% else %}danger{% endif %}" style="font-size:1rem; padding:0.5rem 1rem;">
+                {{ entrenador.disponible|yesno:'Disponible,No disponible' }}
+            </span>
+        </div>
+        
+        <div>
+            <h3>Información Profesional</h3>
+            
+            {% if entrenador.certificacion %}
+            <p><strong>📜 Certificación:</strong> {{ entrenador.certificacion }}</p>
+            {% endif %}
+            
+            {% if entrenador.anos_experiencia %}
+            <p><strong>⭐ Experiencia:</strong> {{ entrenador.anos_experiencia }} años</p>
+            {% endif %}
+            
+            {% if entrenador.biografia %}
+            <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-top:1rem;">
+                <h4>Acerca de mí</h4>
+                <p style="white-space:pre-wrap;">{{ entrenador.biografia }}</p>
+            </div>
+            {% endif %}
+            
+            {% if entrenador.horario %}
+            <div style="margin-top:1.5rem;">
+                <h4>🕐 Horarios de Atención</h4>
+                <p style="white-space:pre-wrap;">{{ entrenador.horario }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white;">
+    <h3 style="color:white;">¿Interesado en entrenar?</h3>
+    <p>Contacta al administrador para solicitar asignación con este entrenador.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Entrenadores - GymFlow{% endblock %}
+
+{% block content %}
+<h1 class="card-title">Nuestros Entrenadores 👨‍🏫</h1>
+
+{% if entrenadores %}
+<div class="grid">
+    {% for e in entrenadores %}
+    <div class="card">
+        <div style="text-align:center; margin-bottom:1rem;">
+            {% if e.foto_perfil %}
+            <img src="{{ e.foto_perfil }}" alt="{{ e.user.username }}" style="width:120px; height:120px; border-radius:50%; object-fit:cover;">
+            {% else %}
+            <div style="width:120px; height:120px; border-radius:50%; background:#3498db; color:white; display:flex; align-items:center; justify-content:center; font-size:3rem; margin:0 auto;">{{ e.user.username.0|upper }}</div>
+            {% endif %}
+        </div>
+        
+        <h3 style="text-align:center;">{{ e.user.get_full_name|default:e.user.username }}</h3>
+        <p style="text-align:center; color:#666;"><strong>{{ e.especialidad }}</strong></p>
+        
+        {% if e.certificacion %}
+        <p style="font-size:0.9rem;">📜 {{ e.certificacion }}</p>
+        {% endif %}
+        
+        {% if e.anos_experiencia %}
+        <p style="font-size:0.9rem;">⭐ {{ e.anos_experiencia }} años</p>
+        {% endif %}
+        
+        <span class="badge badge-{% if e.disponible %}success{% else %}danger{% endif %}">{{ e.disponible|yesno:'Disponible,No disponible' }}</span>
+        
+        <a href="{% url 'entrenador_detail' e.id %}" class="btn btn-primary btn-sm mt-2" style="width:100%;">Ver Perfil</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card text-center">
+    <p>No hay entrenadores disponibles</p>
+</div>
+{% endif %}
+{% endblock %}
+

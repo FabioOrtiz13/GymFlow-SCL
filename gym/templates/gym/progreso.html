@@ -1,0 +1,46 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Mi Progreso - GymFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-between align-center mb-3">
+    <h1>Mi Progreso 📈</h1>
+    <a href="{% url 'registrar_progreso' %}" class="btn btn-success">+ Registrar</a>
+</div>
+
+{% if registros %}
+<div class="card">
+    <h2>Historial de Progreso</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Peso</th>
+                <th>Grasa</th>
+                <th>Músculo</th>
+                <th>Cintura</th>
+                <th>Notas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in registros %}
+            <tr>
+                <td>{{ p.fecha|date:"d/m/Y" }}</td>
+                <td>{{ p.peso }} kg</td>
+                <td>{{ p.grasa_corporal|default:"—" }}%</td>
+                <td>{{ p.masa_muscular|default:"—" }} kg</td>
+                <td>{{ p.cintura|default:"—" }} cm</td>
+                <td>{{ p.notas|truncatewords:5 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card text-center">
+    <p>No has registrado progreso</p>
+    <a href="{% url 'registrar_progreso' %}" class="btn btn-success">Registrar primer progreso</a>
+</div>
+{% endif %}
+{% endblock %}
+

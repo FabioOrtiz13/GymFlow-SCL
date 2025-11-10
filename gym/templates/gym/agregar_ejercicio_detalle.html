@@ -1,0 +1,126 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Configurar Ejercicio - GymFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⚙️ Configurar Ejercicio</h1>
+    <a href="{% url 'agregar_ejercicio' rutina.id %}" class="btn btn-secondary">← Buscar otro ejercicio</a>
+</div>
+
+<!-- Vista previa del ejercicio -->
+<div class="card">
+    <h2>{{ ejercicio.nombre }}</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+            {% if ejercicio.gif_url %}
+            <img src="{{ ejercicio.gif_url }}" alt="{{ ejercicio.nombre }}" style="width: 100%; border-radius: 8px;">
+            {% endif %}
+        </div>
+        
+        <div>
+            {% if ejercicio.partes_cuerpo %}
+            <p><strong>🎯 Zona:</strong> {{ ejercicio.partes_cuerpo }}</p>
+            {% endif %}
+            
+            {% if ejercicio.musculos_principales %}
+            <p><strong>💪 Músculo principal:</strong> {{ ejercicio.musculos_principales }}</p>
+            {% endif %}
+            
+            {% if ejercicio.equipamiento %}
+            <p><strong>⚙️ Equipamiento:</strong> {{ ejercicio.equipamiento }}</p>
+            {% endif %}
+            
+            {% if ejercicio.descripcion %}
+            <p><strong>📝 Descripción:</strong></p>
+            <p style="color: #666;">{{ ejercicio.descripcion|truncatewords:50 }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Formulario de detalles -->
+<div class="card">
+    <h2>📋 Configuración del Ejercicio para la Rutina</h2>
+    <p class="text-muted">Define cómo se realizará este ejercicio en la rutina "{{ rutina.nombre }}"</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>📍 Orden en la rutina</label>
+                <input type="number" name="orden" class="form-control" value="{{ orden_sugerido }}" min="1" required>
+                <small style="color:#666;">Posición del ejercicio en la rutina</small>
+            </div>
+            
+            <div class="form-group">
+                <label>🔢 Series</label>
+                <input type="number" name="series" class="form-control" value="3" min="1" required>
+                <small style="color:#666;">Número de series a realizar</small>
+            </div>
+        </div>
+        
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>🔁 Repeticiones</label>
+                <input type="number" name="repeticiones" class="form-control" value="10" min="1" required>
+                <small style="color:#666;">Repeticiones por serie</small>
+            </div>
+            
+            <div class="form-group">
+                <label>⚖️ Peso (kg) - Opcional</label>
+                <input type="number" name="peso" class="form-control" step="0.5" placeholder="Ej: 20">
+                <small style="color:#666;">Peso a utilizar (dejar vacío si es peso corporal)</small>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>⏱️ Descanso entre series (segundos)</label>
+            <input type="number" name="descanso_seg" class="form-control" value="60" min="10" required>
+            <small style="color:#666;">Tiempo de recuperación entre series</small>
+        </div>
+        
+        <div class="form-group">
+            <label>📝 Notas adicionales (opcional)</label>
+            <textarea name="notas" class="form-control" rows="3" placeholder="Instrucciones especiales, técnica, consejos..."></textarea>
+            <small style="color:#666;">Información adicional para el cliente</small>
+        </div>
+        
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-success">✅ Agregar a la rutina</button>
+            <a href="{% url 'agregar_ejercicio' rutina.id %}" class="btn btn-secondary">← Buscar otro</a>
+            <a href="{% url 'rutina_detail' rutina.id %}" class="btn btn-danger">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<!-- Ejemplos de configuración -->
+<div class="card">
+    <h3>💡 Ejemplos de configuración</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        <div style="padding: 10px; background: #f5f5f5; border-radius: 5px;">
+            <strong>🏋️ Fuerza</strong>
+            <p style="margin: 5px 0; font-size: 0.9em;">3-5 series</p>
+            <p style="margin: 5px 0; font-size: 0.9em;">4-6 reps</p>
+            <p style="margin: 5px 0; font-size: 0.9em;">120-180 seg descanso</p>
+        </div>
+        
+        <div style="padding: 10px; background: #f5f5f5; border-radius: 5px;">
+            <strong>💪 Hipertrofia</strong>
+            <p style="margin: 5px 0; font-size: 0.9em;">3-4 series</p>
+            <p style="margin: 5px 0; font-size: 0.9em;">8-12 reps</p>
+            <p style="margin: 5px 0; font-size: 0.9em;">60-90 seg descanso</p>
+        </div>
+        
+        <div style="padding: 10px; background: #f5f5f5; border-radius: 5px;">
+            <strong>🏃 Resistencia</strong>
+            <p style="margin: 5px 0; font-size: 0.9em;">2-3 series</p>
+            <p style="margin: 5px 0; font-size: 0.9em;">15-20 reps</p>
+            <p style="margin: 5px 0; font-size: 0.9em;">30-45 seg descanso</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

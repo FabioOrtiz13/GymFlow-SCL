@@ -1,0 +1,52 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Registro - GymFlow{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="auth-title">💪 GymFlow</h1>
+        <h2 class="text-center mb-3">Crear Cuenta</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Usuario</label>
+                {{ form.username }}
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                {{ form.email }}
+            </div>
+            
+            <div class="form-group">
+                <label>Contraseña</label>
+                {{ form.password1 }}
+            </div>
+            
+            <div class="form-group">
+                <label>Confirmar Contraseña</label>
+                {{ form.password2 }}
+            </div>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <p><strong>{{ field }}:</strong> {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-success" style="width: 100%;">Crear Cuenta</button>
+        </form>
+        
+        <p class="text-center mt-3">
+            ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

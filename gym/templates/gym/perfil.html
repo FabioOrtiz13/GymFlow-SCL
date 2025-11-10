@@ -1,0 +1,32 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Mi Perfil - GymFlow{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Mi Perfil 👤</h1>
+    
+    <div style="margin-bottom:2rem;">
+        <p><strong>Usuario:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Tipo:</strong> <span class="badge badge-primary">{{ perfil.get_tipo_usuario_display }}</span></p>
+        <p><strong>Nivel:</strong> <span class="badge badge-success">{{ perfil.get_nivel_experiencia_display }}</span></p>
+    </div>
+    
+    <h2>Editar Información</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+    </form>
+</div>
+{% endblock %}
+

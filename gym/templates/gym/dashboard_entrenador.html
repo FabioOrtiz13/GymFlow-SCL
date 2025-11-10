@@ -1,0 +1,148 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Dashboard Entrenador - GymFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👨‍🏫 Dashboard de Entrenador</h1>
+    <p class="text-muted">¡Hola, {{ user.username }}! Bienvenido a tu panel de entrenador</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_rutinas_creadas }}</div>
+        <div class="stat-label">Rutinas Creadas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_rutinas_asignadas }}</div>
+        <div class="stat-label">Rutinas Asignadas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_clientes }}</div>
+        <div class="stat-label">Clientes Activos</div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="card">
+    <h2>⚡ Acciones Rápidas</h2>
+    <div class="d-flex gap-1">
+        <a href="{% url 'rutina_create' %}" class="btn btn-success">➕ Crear Nueva Rutina</a>
+        <a href="{% url 'mis_clientes' %}" class="btn btn-primary">👥 Ver Mis Clientes</a>
+        <a href="{% url 'rutinas_list' %}" class="btn btn-primary">📋 Mis Rutinas</a>
+        <a href="{% url 'ejercicios_list' %}" class="btn btn-primary">🏋️ Explorar Ejercicios</a>
+    </div>
+</div>
+
+<!-- Mis Clientes -->
+{% if clientes %}
+<div class="card">
+    <div class="d-flex justify-between align-center mb-2">
+        <h2>👥 Mis Clientes</h2>
+        <a href="{% url 'mis_clientes' %}" class="btn btn-primary btn-sm">Ver todos</a>
+    </div>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Email</th>
+                <th>Rutinas Asignadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.username }}</td>
+                <td>{{ cliente.email|default:"—" }}</td>
+                <td>{{ cliente.rutinas.count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <div class="text-center">
+        <h3>👥 Aún no tienes clientes</h3>
+        <p class="text-muted">Crea rutinas y asígnalas para empezar a entrenar clientes.</p>
+        <a href="{% url 'rutina_create' %}" class="btn btn-success mt-3">Crear mi primera rutina</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Rutinas Recientes -->
+{% if rutinas_recientes %}
+<div class="card">
+    <div class="d-flex justify-between align-center mb-2">
+        <h2>📋 Mis Rutinas Recientes</h2>
+        <a href="{% url 'rutinas_list' %}" class="btn btn-primary btn-sm">Ver todas</a>
+    </div>
+    
+    <div class="grid">
+        {% for rutina in rutinas_recientes %}
+        <div class="rutina-card">
+            <h3>{{ rutina.nombre }}</h3>
+            <p>{{ rutina.descripcion|truncatewords:15 }}</p>
+            <div class="d-flex justify-between align-center mt-2">
+                <span class="badge badge-primary">{{ rutina.get_dificultad_display }}</span>
+                <span>{{ rutina.total_ejercicios }} ejercicios</span>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+                <a href="{% url 'rutina_detail' rutina.id %}" class="btn btn-primary btn-sm">Ver</a>
+                <a href="{% url 'asignar_rutina' rutina.id %}" class="btn btn-success btn-sm">Asignar</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Últimas Asignaciones -->
+{% if ultimas_asignaciones %}
+<div class="card">
+    <h2>🔔 Últimas Rutinas Asignadas</h2>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rutina</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rutina in ultimas_asignaciones %}
+            <tr>
+                <td><a href="{% url 'rutina_detail' rutina.id %}">{{ rutina.nombre }}</a></td>
+                <td>{{ rutina.usuario.username }}</td>
+                <td>{{ rutina.fecha_creacion|date:"d/m/Y" }}</td>
+                <td>
+                    {% if rutina.activa %}
+                    <span class="badge badge-success">Activa</span>
+                    {% else %}
+                    <span class="badge badge-secondary">Inactiva</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Consejos para Entrenadores -->
+<div class="card">
+    <h2>💡 Consejos Profesionales</h2>
+    <ul>
+        <li>📊 Revisa regularmente el progreso de tus clientes</li>
+        <li>🎯 Personaliza las rutinas según los objetivos de cada cliente</li>
+        <li>📝 Agrega notas detalladas en cada ejercicio</li>
+        <li>🔄 Actualiza las rutinas cada 4-6 semanas para mejor progresión</li>
+        <li>💬 Mantén comunicación constante con tus clientes</li>
+    </ul>
+</div>
+{% endblock %}
+

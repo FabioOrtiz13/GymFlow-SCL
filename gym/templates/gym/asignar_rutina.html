@@ -1,0 +1,61 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Asignar Rutina - GymFlow{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📋 Asignar Rutina</h1>
+    <p class="text-muted">Asigna tu rutina "{{ rutina.nombre }}" a un cliente</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h3>Información de la rutina</h3>
+        <p><strong>Nombre:</strong> {{ rutina.nombre }}</p>
+        <p><strong>Dificultad:</strong> {{ rutina.get_dificultad_display }}</p>
+        <p><strong>Duración:</strong> {{ rutina.duracion_min }} minutos</p>
+        <p><strong>Ejercicios:</strong> {{ rutina.total_ejercicios }}</p>
+        
+        {% if rutina.descripcion %}
+        <p><strong>Descripción:</strong><br>{{ rutina.descripcion }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h3>Seleccionar cliente</h3>
+        
+        {% if usuarios %}
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Cliente</label>
+                <select name="usuario_id" class="form-control" required>
+                    <option value="">Selecciona un cliente...</option>
+                    {% for usuario in usuarios %}
+                    <option value="{{ usuario.id }}">
+                        {{ usuario.username }} - {{ usuario.get_full_name|default:"Sin nombre" }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>ℹ️ Nota:</strong> Se creará una copia de esta rutina para el cliente seleccionado.
+            </div>
+            
+            <button type="submit" class="btn btn-primary">✅ Asignar rutina</button>
+            <a href="{% url 'rutina_detail' rutina.id %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+        {% else %}
+        <div class="alert alert-warning">
+            <p class="mb-0">No hay clientes disponibles para asignar rutinas.</p>
+        </div>
+        <a href="{% url 'rutinas_list' %}" class="btn btn-secondary">Volver a rutinas</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

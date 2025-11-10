@@ -1,0 +1,160 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Ejercicios - GymFlow{% endblock %}
+
+{% block content %}
+<h1 class="card-title">Ejercicios 🏋️</h1>
+
+<p style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+    🌐 <strong>{{ total_ejercicios }} ejercicios profesionales</strong> desde <a href="https://exercisedb.dev" target="_blank">ExerciseDB</a> con GIFs, fotos e instrucciones
+    <button onclick="document.querySelectorAll('.debug-url').forEach(el => el.style.display = el.style.display === 'none' ? 'block' : 'none')" 
+            style="float:right; padding:0.25rem 0.5rem; background:#f44336; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.8rem;">
+        🔍 Ver URLs Debug
+    </button>
+</p>
+
+<!-- Filtros por Zona -->
+<div class="card">
+    <h3 style="margin-bottom: 1rem;">🎯 Filtrar por Zona Muscular</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <a href="{% url 'ejercicios_list' %}" class="btn {% if not zona %}btn-primary{% else %}btn-secondary{% endif %}" style="flex: 1; min-width: 120px;">
+            🔄 Todos
+        </a>
+        {% for z in zonas %}
+        <a href="?zona={{ z }}" class="btn {% if zona == z %}btn-primary{% else %}btn-secondary{% endif %}" style="flex: 1; min-width: 120px;">
+            {% if z == 'Pecho' %}🦾{% elif z == 'Piernas' %}🦵{% elif z == 'Espalda' %}💪{% elif z == 'Hombros' %}🏋️{% elif z == 'Brazos' %}💪{% elif z == 'Core' %}🎯{% endif %} {{ z }}
+        </a>
+        {% endfor %}
+    </div>
+    
+    <!-- Búsqueda Instantánea -->
+    <div class="search-bar">
+        <input type="text" id="buscar-input" class="form-control" placeholder="🔍 Buscar por nombre, músculo o equipo... (filtrado instantáneo)" value="{{ query }}">
+        <a href="{% url 'ejercicios_list' %}" class="btn btn-danger">✖ Limpiar</a>
+    </div>
+    
+    <!-- Contador de resultados -->
+    <p id="contador-resultados" style="color: #666; margin-top: 1rem; font-size: 0.9rem;"></p>
+</div>
+
+<!-- Lista de Ejercicios -->
+{% if ejercicios %}
+<div class="card">
+    <p style="color: #666; margin-bottom: 1rem;">Mostrando {{ ejercicios|length }} ejercicios</p>
+    
+    <div class="grid">
+        {% for ej in ejercicios %}
+        <div class="exercise-card">
+            <!-- GIF o Imagen -->
+            <div style="width:100%; height:220px; background:#f8f9fa; border-radius:8px; margin-bottom:1rem; overflow:hidden; display:flex; align-items:center; justify-content:center; position:relative;">
+                {% if ej.gifUrl %}
+                    <!-- Mostrar GIF animado (preferido) -->
+                    <img src="{{ ej.gifUrl }}" 
+                         alt="{{ ej.name }}" 
+                         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0;" 
+                         onerror="console.error('Error cargando GIF: {{ ej.gifUrl }}'); this.style.display='none'; this.parentElement.querySelector('.fallback-icon').style.display='flex';"
+                         onload="console.log('GIF cargado: {{ ej.name }}');"
+                         loading="lazy">
+                    <div class="fallback-icon" style="display:none; width:100%; height:100%; align-items:center; justify-content:center; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-size:3rem; position:absolute; top:0; left:0;">🏋️<br><small style="font-size:0.5rem;">{{ ej.name }}</small></div>
+                {% elif ej.imageUrl %}
+                    <!-- Imagen estática como fallback -->
+                    <img src="{{ ej.imageUrl }}" 
+                         alt="{{ ej.name }}" 
+                         style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0;" 
+                         onerror="console.error('Error cargando imagen: {{ ej.imageUrl }}'); this.style.display='none'; this.parentElement.querySelector('.fallback-icon').style.display='flex';"
+                         onload="console.log('Imagen cargada: {{ ej.name }}');"
+                         loading="lazy">
+                    <div class="fallback-icon" style="display:none; width:100%; height:100%; align-items:center; justify-content:center; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-size:3rem; position:absolute; top:0; left:0;">🏋️<br><small style="font-size:0.5rem;">{{ ej.name }}</small></div>
+                {% else %}
+                    <div class="fallback-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-size:3rem; position:absolute; top:0; left:0;">🏋️<br><small style="font-size:0.5rem;">{{ ej.name }}</small></div>
+                {% endif %}
+                
+                <!-- DEBUG: Mostrar URLs (quitar después) -->
+                <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.7); color:white; font-size:0.6rem; padding:0.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:none;" class="debug-url">
+                    GIF: {{ ej.gifUrl|default:"NO" }} | IMG: {{ ej.imageUrl|default:"NO" }}
+                </div>
+            </div>
+            
+            <h3>{{ ej.name }}</h3>
+            
+            <!-- Zona Muscular -->
+            <span class="badge" style="background: #667eea; color: white; font-size: 0.75rem; margin-bottom: 0.5rem; display: inline-block;">
+                📍 {{ ej.bodyParts }}
+            </span>
+            
+            {% if ej.overview %}
+            <p style="font-size:0.9rem; color:#666;">{{ ej.overview|truncatewords:15 }}</p>
+            {% endif %}
+            
+            <p style="font-size:0.85rem;"><strong>💪</strong> {{ ej.targetMuscles|truncatewords:3 }}</p>
+            <p style="font-size:0.85rem;"><strong>🏋️</strong> {{ ej.equipments }}</p>
+            
+            <div class="d-flex gap-1">
+                {% if ej.gifUrl %}
+                <span class="badge badge-primary">🎬 GIF</span>
+                {% elif ej.videoUrl %}
+                <span class="badge badge-primary">🎥 Video</span>
+                {% endif %}
+                {% if ej.imageUrl %}
+                <span class="badge badge-success">📸 Foto</span>
+                {% endif %}
+            </div>
+            
+            <a href="{% url 'ejercicio_detail' ej.id %}" class="btn btn-primary btn-sm mt-2" style="width:100%;">Ver Detalle</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="card text-center">
+    <p>No se encontraron ejercicios</p>
+    <a href="{% url 'ejercicios_list' %}" class="btn btn-primary">Ver todos</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Filtrado instantáneo de ejercicios
+document.addEventListener('DOMContentLoaded', function() {
+    const inputBuscar = document.getElementById('buscar-input');
+    const tarjetas = document.querySelectorAll('.exercise-card');
+    const contador = document.getElementById('contador-resultados');
+    
+    // Función para actualizar el contador
+    function actualizarContador() {
+        const visibles = Array.from(tarjetas).filter(card => card.style.display !== 'none').length;
+        contador.textContent = `Mostrando ${visibles} de ${tarjetas.length} ejercicios`;
+    }
+    
+    // Inicializar contador
+    actualizarContador();
+    
+    // Filtrado instantáneo mientras escribes
+    inputBuscar.addEventListener('input', function() {
+        const busqueda = this.value.toLowerCase().trim();
+        
+        tarjetas.forEach(card => {
+            // Obtener todo el texto de la tarjeta
+            const texto = card.textContent.toLowerCase();
+            
+            // Mostrar/ocultar según coincidencia
+            if (busqueda === '' || texto.includes(busqueda)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Actualizar contador
+        actualizarContador();
+    });
+    
+    // Si hay query inicial, aplicar filtro
+    if (inputBuscar.value) {
+        inputBuscar.dispatchEvent(new Event('input'));
+    }
+});
+</script>
+{% endblock %}
+

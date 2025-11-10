@@ -1,0 +1,33 @@
+{% extends 'gym/base.html' %}
+
+{% block title %}Favoritos - GymFlow{% endblock %}
+
+{% block content %}
+<h1 class="card-title">Mis Favoritos ⭐</h1>
+
+{% if favoritos %}
+<div class="card">
+    <h2>Ejercicios Favoritos</h2>
+    <div class="grid">
+        {% for fav in favoritos %}
+        {% if fav.ejercicio %}
+        <div class="exercise-card">
+            <h3>{{ fav.ejercicio.nombre }}</h3>
+            <p><strong>Músculos:</strong> {{ fav.ejercicio.musculos_principales|truncatewords:3 }}</p>
+            <div class="d-flex gap-1">
+                <a href="{% url 'ejercicio_detail' fav.ejercicio.ejercicio_id %}" class="btn btn-primary btn-sm">Ver</a>
+                <a href="{% url 'toggle_favorito' fav.ejercicio.ejercicio_id %}" class="btn btn-danger btn-sm">Quitar</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="card text-center">
+    <p>No tienes favoritos</p>
+    <a href="{% url 'ejercicios_list' %}" class="btn btn-primary">Explorar ejercicios</a>
+</div>
+{% endif %}
+{% endblock %}
+
